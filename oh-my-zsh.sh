@@ -1,3 +1,13 @@
+# create ~/.zsh.custom directory unless it exists
+if [ -d "${ZDOTDIR:-${HOME}}/.zsh.custom/before" ]; then
+  for config_file (${ZDOTDIR:-${HOME}}/.zsh.custom/before/*.zsh(N)); do
+	custom_before_config="${ZDOTDIR:-${HOME}}/.zsh.before/${config_file:t}"
+	[ -f "${custom_before_config}" ] && config_file=${custom_before_config}
+	source $config_file
+  done
+fi
+# load users custom config before any of oh-my-zsh is loaded
+
 # Set ZSH_CACHE_DIR to the path where cache files should be created
 # or else we will use the default cache/
 if [[ -z "$ZSH_CACHE_DIR" ]]; then
@@ -27,7 +37,6 @@ autoload -U compaudit compinit
 if [[ -z "$ZSH_CUSTOM" ]]; then
     ZSH_CUSTOM="$ZSH/custom"
 fi
-
 
 is_plugin() {
   local base_dir=$1
@@ -129,4 +138,15 @@ if [ ! "$ZSH_THEME" = ""  ]; then
   else
     source "$ZSH/themes/$ZSH_THEME.zsh-theme"
   fi
+fi
+
+# create ~/.zsh.custom/after directory unless it exists
+if [ -d "${ZDOTDIR:-${HOME}}/.zsh.custom/after" ]; then
+	# load users custom config after any of oh-my-zsh is loaded
+	# this allows simple custom overwrites of oh-my-zsh alias, env and functions.
+	for config_file (${ZDOTDIR:-${HOME}}/.zsh.custom/after/*.zsh(N)); do
+		custom_after_config="${ZDOTDIR:-${HOME}}/.zsh.custom/after/${config_file:t}"
+		[ -f "${custom_after_config}" ] && config_file=${custom_after_config}
+		source $config_file
+	done
 fi
